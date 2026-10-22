@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>S1 Maths Assessment</title>
+<style>
+:root{--ink:#0b1f3a;--pri:#0b4fa8;--ok:#0a6b2d;--bad:#a30f1f;--line:#1d3557}
+*{box-sizing:border-box}
+body{margin:0;font:20px/1.5 Verdana,"Segoe UI",Arial,sans-serif;color:var(--ink);background:#f3f6fb}
+.wrap{max-width:900px;margin:auto;padding:12px}
+.top{position:sticky;top:0;background:var(--ink);color:#fff;padding:10px 14px;z-index:5}
+.top .in{max-width:900px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:10px}
+#tm{font:700 30px "Courier New",monospace}.low{color:#ffd23f}
+.card{background:#fff;border:3px solid var(--line);border-radius:14px;padding:18px;margin:12px 0}
+.bar{height:12px;background:#cfd9e8;border-radius:6px;margin-top:6px}.bar i{display:block;height:100%;background:var(--pri);border-radius:6px}
+.opt{display:flex;gap:12px;width:100%;text-align:left;font:inherit;padding:14px;margin:10px 0;border:3px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer;align-items:center}
+.opt b{min-width:40px;height:40px;border-radius:50%;background:#e3ebf7;display:grid;place-items:center}
+.opt.sel{background:var(--pri);color:#fff}.opt.sel b{background:#fff;color:var(--pri)}
+.btn{font:inherit;font-weight:700;padding:12px 22px;border-radius:10px;border:3px solid var(--pri);background:var(--pri);color:#fff;cursor:pointer}
+.btn.alt{background:#fff;color:var(--pri)}.btn:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible{outline:4px solid #e08a00;outline-offset:2px}
+.nav{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px}
+.nav button{font:inherit;font-weight:700;height:48px;border:3px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer}
+.nav .ans{background:#bcd3ff}.nav .cur{outline:4px solid #e08a00}
+.modal{position:fixed;inset:0;background:#000b;display:grid;place-items:center;padding:14px;z-index:9}
+.modal .card{max-width:520px}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.big{font-size:56px;font-weight:700;line-height:1.1}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}.stats div{border:3px solid var(--line);border-radius:10px;padding:8px}
+.tp{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;margin:8px 0}.tp .bar{grid-column:1/3;margin:0}
+.rv.ok{border-color:var(--ok)}.rv.bad{border-color:var(--bad)}.rv.skip{border-color:#8a6d00}
+.badge{font-weight:700;padding:2px 10px;border-radius:20px;color:#fff;font-size:17px}
+.ok .badge{background:var(--ok)}.bad .badge{background:var(--bad)}.skip .badge{background:#8a6d00}
+.o{padding:8px 12px;border:2px solid #9fb0c8;border-radius:8px;margin:6px 0;font-size:18px}
+.o.c{background:#d8f3e0;border-color:var(--ok)}.o.w{background:#fde0e3;border-color:var(--bad)}
+.ex{background:#eef3fb;border-radius:8px;padding:8px 12px;font-size:18px}
+svg{max-width:100%;height:auto;display:block;margin:8px auto}svg text{fill:#0b1f3a;font:16px Verdana,sans-serif}
+input[type=text]{font:inherit;padding:10px;border:3px solid var(--line);border-radius:8px;width:100%;max-width:360px}
+ul{padding-left:22px}
+@media print{.top,.noprint{display:none}}
+</style></head><body>
+<div id="app"></div>
+<script>
+const TN={F:"Factors, multiples & primes",S:"Sequences",P:"Perimeter & area",N:"Negative numbers",A:"Averages"};
+/* STUDENT-FACING QUESTIONS: [question, options, diagram] */
+const Q=[
+["Which number is a multiple of 6?",["16","24","26","32"]],
+["Which of these numbers is the smallest?",["−2","0","−7","3"]],
+["What is the next number in this sequence?<br>4, 7, 10, 13, …",["16","15","17","14"]],
+["What is the perimeter of this rectangle?",["11 cm","22 cm","24 cm","16 cm"],"R:8:3"],
+["Which number is a prime number?",["1","9","13","15"]],
+["What is 5 + (−8)?",["3","−3","13","−13"]],
+["Here are some numbers: 1, 4, 4, 6, 7, 9.<br>What is the mode?",["4","5","6","9"]],
+["What is the next number in this sequence?<br>20, 17, 14, 11, …",["12","9","8","7"]],
+["What is the area of this square?",["10 cm²","25 cm²","20 cm²","5 cm²"],"R:5:5"],
+["What is 3 − 7?",["−4","4","−10","10"]],
+["Which list shows ALL the factors of 12?",["1, 2, 3, 6, 12","1, 2, 4, 6, 12","12, 24, 36, 48","1, 2, 3, 4, 6, 12"]],
+["What is the nth term of the sequence 3, 6, 9, 12, …?",["n + 3","3n + 3","12n","3n"]],
+["What is −4 × 5?",["−9","20","−20","9"]],
+["What is the area of this triangle?",["24 cm²","10 cm²","20 cm²","12 cm²"],"T:6:4"],
+["What is the highest common factor (HCF) of 12 and 18?",["3","6","36","2"]],
+["What is the area of this rectangle?",["13 cm²","26 cm²","36 cm²","18 cm²"],"R:9:4"],
+["What is the lowest common multiple (LCM) of 4 and 6?",["12","24","2","10"]],
+["What is the nth term of the sequence 5, 7, 9, 11, …?",["n + 4","2n + 3","2n + 5","5n"]],
+["Which list is in order from smallest to largest?",["−1, −5, 0, 3","3, 0, −1, −5","−5, −1, 0, 3","0, −1, −5, 3"]],
+["Find the mean of 2, 4, 4 and 10.",["4","5","6","20"]],
+["What is the area of this shape?",["60 cm²","48 cm²","72 cm²","38 cm²"],"L"],
+["Which shows 36 written as a product of prime factors?",["2 × 18","4 × 9","2 × 2 × 3 × 3","6 × 6"]],
+["What is −12 ÷ (−3)?",["−4","−9","9","4"]],
+["At 6 am the temperature is −4 °C. By noon it has risen by 9 °C. What is the temperature at noon?",["5 °C","−5 °C","13 °C","−13 °C"]],
+["The nth term of a sequence is 4n + 3. Which number is in this sequence?",["30","31","32","34"]],
+["How many more students chose Dog than Cat?",["4","12","20","2"],"B"],
+["A rectangle has a perimeter of 30 cm. Its length is 9 cm. What is its width?",["21 cm","12 cm","6 cm","3 cm"]],
+["A sequence has nth term 3n − 1, so it starts 2, 5, 8, …<br>What is the 20th term?",["61","40","62","59"]],
+["A square has a perimeter of 24 cm. What is its area?",["6 cm²","24 cm²","36 cm²","144 cm²"]],
+["Bus A leaves the station every 6 minutes. Bus B leaves every 8 minutes. They both leave together at 9:00. After how many minutes will they next leave together?",["24 minutes","2 minutes","14 minutes","48 minutes"]]
+];
+/* ANSWER KEY (kept apart from the questions; only read at marking): [topic, correct index, explanation, misconception] */
+const K=[
+["F",1,"6 × 4 = 24, so 24 is in the 6 times table. Multiples come from the times table; factors divide into a number.","Mixes up factors and multiples"],
+["N",2,"−7 is furthest left of zero on the number line, so it is the smallest.","Orders negatives by digit size, ignoring the sign"],
+["S",0,"The sequence goes up by 3 each time: 13 + 3 = 16.","Slips when continuing a pattern (wrong step)"],
+["P",1,"Perimeter = 8 + 3 + 8 + 3 = 22 cm. (24 is the area.)","Confuses perimeter with area, or adds only two sides"],
+["F",2,"13 only divides by 1 and 13. 9 = 3 × 3 and 15 = 3 × 5. The number 1 is not prime.","Thinks 1 or odd numbers are prime"],
+["N",1,"Start at 5 and move 8 left on a number line. You land on −3.","Ignores the sign when adding a negative"],
+["A",0,"The mode is the most common value. 4 appears twice.","Confuses mode with median or mean"],
+["S",2,"The sequence goes down by 3 each time: 11 − 3 = 8.","Does not spot the constant step in a decreasing sequence"],
+["P",1,"Area = 5 × 5 = 25 cm². (20 cm is the perimeter.)","Confuses area with perimeter"],
+["N",0,"Start at 3 and go down 7. You pass zero and reach −4.","Cannot cross zero when subtracting"],
+["F",3,"Factor pairs of 12: 1 × 12, 2 × 6, 3 × 4. So the factors are 1, 2, 3, 4, 6, 12.","Misses factors or lists multiples instead"],
+["S",3,"The terms go up in 3s: 3 × 1, 3 × 2, 3 × 3 … so the nth term is 3n.","Adds the difference (n + 3) instead of multiplying"],
+["N",2,"Positive × negative = negative. 4 × 5 = 20, so the answer is −20.","Wrong sign rule for multiplying"],
+["P",3,"Area of a triangle = ½ × base × height = ½ × 6 × 4 = 12 cm². 24 forgets the half.","Forgets the half in the triangle area"],
+["F",1,"Factors of 12: 1, 2, 3, 4, 6, 12. Factors of 18: 1, 2, 3, 6, 9, 18. The biggest shared factor is 6. (36 is the LCM.)","Confuses HCF with LCM, or picks a common factor that is not the highest"],
+["P",2,"Area = length × width = 9 × 4 = 36 cm². (26 cm is the perimeter.)","Adds the sides instead of multiplying"],
+["F",0,"Multiples of 4: 4, 8, 12 … Multiples of 6: 6, 12 … The first match is 12.","Confuses LCM with HCF, or multiplies the numbers"],
+["S",1,"The sequence goes up by 2, so start with 2n. 2n gives 2 for n = 1 but the first term is 5, so add 3: 2n + 3.","Forgets to adjust with the number added after finding the step"],
+["N",2,"On a number line −5 is left of −1, which is left of 0, which is left of 3.","Orders negatives by digit size"],
+["A",1,"Mean = total ÷ number of values = (2 + 4 + 4 + 10) ÷ 4 = 20 ÷ 4 = 5.","Confuses mean with median or mode, or gives the total"],
+["P",1,"Whole rectangle 10 × 6 = 60. Missing corner 4 × 3 = 12. Area = 60 − 12 = 48 cm².","Ignores or adds the missing corner"],
+["F",2,"36 = 2 × 2 × 3 × 3. Every factor must be prime, and 4, 6 and 18 are not prime.","Stops before every factor is prime"],
+["N",3,"Negative ÷ negative = positive. 12 ÷ 3 = 4.","Wrong sign rule for dividing"],
+["N",0,"Start at −4 and go up 9: −4 + 9 = 5 °C.","Wrong direction or sign when a temperature rises from below zero"],
+["S",1,"4n + 3 gives 7, 11, 15 … With n = 7: 4 × 7 + 3 = 31. The others do not fit.","Cannot test whether a number fits an nth term rule"],
+["A",0,"Dog = 12 and Cat = 8. 12 − 8 = 4.","Misreads the bar chart or adds instead of comparing"],
+["P",2,"Two lengths = 9 + 9 = 18 cm. Two widths = 30 − 18 = 12 cm, so one width = 6 cm.","Forgets perimeter has two lengths and two widths"],
+["S",3,"3 × 20 − 1 = 60 − 1 = 59.","Cannot use an nth term rule to find a later term"],
+["P",2,"Side = 24 ÷ 4 = 6 cm. Area = 6 × 6 = 36 cm².","Stops at the side length, or confuses area with perimeter"],
+["F",0,"Multiples of 6: 6, 12, 18, 24 … Multiples of 8: 8, 16, 24 … The first match is 24 (the LCM).","Confuses LCM with HCF, or adds the numbers"]
+];
+function dia(d){
+ if(!d)return"";const[t,a,b]=d.split(":");
+ if(t=="R"){const w=+a,h=+b,s=Math.min(220/w,100/h),X=w*s,Y=h*s;
+  return `<svg viewBox="0 0 320 170" role="img" aria-label="Rectangle ${w} cm by ${h} cm"><rect x="40" y="20" width="${X}" height="${Y}" fill="#dbe8ff" stroke="#0b1f3a" stroke-width="3"/><text x="${40+X/2}" y="${Y+46}" text-anchor="middle">${w} cm</text><text x="${X+48}" y="${20+Y/2+5}">${h} cm</text></svg>`}
+ if(t=="T")return `<svg viewBox="0 0 320 180" role="img" aria-label="Triangle base ${a} cm, height ${b} cm"><polygon points="40,140 240,140 150,30" fill="#dbe8ff" stroke="#0b1f3a" stroke-width="3"/><line x1="150" y1="30" x2="150" y2="140" stroke="#a30f1f" stroke-width="3" stroke-dasharray="6 5"/><text x="140" y="165" text-anchor="middle">base ${a} cm</text><text x="158" y="92">height ${b} cm</text></svg>`;
+ if(t=="L")return `<svg viewBox="0 0 320 190" role="img" aria-label="L-shape: bottom 10 cm, left 6 cm, top 6 cm, step 3 cm down and 4 cm across, right 3 cm"><polygon points="50,20 170,20 170,80 250,80 250,140 50,140" fill="#dbe8ff" stroke="#0b1f3a" stroke-width="3"/><text x="150" y="165" text-anchor="middle">10 cm</text><text x="4" y="86">6 cm</text><text x="110" y="14" text-anchor="middle">6 cm</text><text x="176" y="56">3 cm</text><text x="210" y="72" text-anchor="middle">4 cm</text><text x="256" y="114">3 cm</text></svg>`;
+ if(t=="B"){const v=[["Cat",8],["Dog",12],["Fish",5],["Rabbit",3]];let g="";
+  [0,4,8,12].forEach(n=>g+=`<line x1="45" x2="310" y1="${170-n*10}" y2="${170-n*10}" stroke="#9fb0c8"/><text x="38" y="${175-n*10}" text-anchor="end">${n}</text>`);
+  v.forEach((o,i)=>g+=`<rect x="${65+i*62}" y="${170-o[1]*10}" width="44" height="${o[1]*10}" fill="#0b4fa8"/><text x="${87+i*62}" y="190" text-anchor="middle" style="font-size:14px">${o[0]}</text>`);
+  return `<svg viewBox="0 0 320 215" role="img" aria-label="Bar chart: Cat 8, Dog 12, Fish 5, Rabbit 3"><text x="170" y="16" text-anchor="middle" style="font-weight:700">Favourite pet (number of students)</text><g transform="translate(0,12)">${g}</g></svg>`}
+}
+let S={cur:0,a:Array(30).fill(null),end:0,iv:null,name:"",t0:0};
+const $=id=>document.getElementById(id);const LT="ABCD";
+function home(){$("app").innerHTML=`<div class="wrap"><div class="card"><h1>S1 Maths Assessment</h1><p>30 questions · 30 minutes · one answer per question.</p><ul><li>Read each question carefully and pick A, B, C or D.</li><li>You can change an answer or go back to any question before you submit.</li><li>Answers and your score are shown after you submit.</li></ul><p><label for="nm">Your name (optional)</label><br><input type="text" id="nm" autocomplete="off"></p><button class="btn" onclick="start()">Start the assessment</button></div></div>`}
+function start(){S.name=$("nm").value.trim();S.t0=Date.now();S.end=S.t0+1800000;
+ $("app").innerHTML=`<div class="top"><div class="in"><div id="prog" aria-live="polite"></div><div>Time left <span id="tm">30:00</span></div></div></div><div class="wrap"><div class="bar" aria-hidden="true"><i id="pb"></i></div><div class="card" id="qc"></div><div class="row"><button class="btn alt" id="pv" onclick="go(S.cur-1)">‹ Previous</button><button class="btn" id="nx" onclick="nextQ()">Next ›</button></div><div class="card"><div class="row"><b>Question navigator</b><button class="btn alt" onclick="ask()">Submit assessment</button></div><p style="font-size:16px;margin:4px 0 10px">Blue = answered · White = not answered · Orange outline = this question</p><div class="nav" id="nv"></div></div></div>`;
+ S.iv=setInterval(tick,500);tick();show()}
+function tick(){const r=Math.max(0,Math.ceil((S.end-Date.now())/1000));const e=$("tm");if(!e)return;
+ e.textContent=String(Math.floor(r/60)).padStart(2,"0")+":"+String(r%60).padStart(2,"0");e.className=r<=300?"low":"";if(r<=0)finish(true)}
+function show(){const c=S.cur,q=Q[c];
+ $("prog").innerHTML=`<b>Question ${c+1} of 30</b>`;$("pb").style.width=((c+1)/30*100)+"%";
+ $("qc").innerHTML=`<p style="font-size:24px;margin-top:0"><b>${c+1}.</b> ${q[0]}</p>${dia(q[2])}`+q[1].map((o,i)=>`<button class="opt${S.a[c]===i?" sel":""}" aria-pressed="${S.a[c]===i}" onclick="pick(${i})"><b>${LT[i]}</b><span>${o}</span></button>`).join("")+`<button class="btn alt" style="font-size:16px;padding:6px 12px" onclick="pick(-1)">Clear my answer</button>`;
+ $("pv").disabled=c==0;$("nx").textContent=c==29?"Finish ✓":"Next ›";
+ $("nv").innerHTML=Q.map((_,i)=>`<button class="${S.a[i]!==null?"ans ":""}${i==c?"cur":""}" aria-label="Question ${i+1}${S.a[i]!==null?", answered":""}" onclick="go(${i})">${i+1}</button>`).join("")}
+function pick(i){S.a[S.cur]=i<0?null:(S.a[S.cur]===i?null:i);show()}
+function go(i){if(i>=0&&i<30){S.cur=i;show();window.scrollTo(0,0)}}
+function nextQ(){S.cur==29?ask():go(S.cur+1)}
+function ask(){const u=S.a.filter(x=>x===null).length;const m=document.createElement("div");m.className="modal";m.id="md";
+ m.innerHTML=`<div class="card" role="dialog" aria-modal="true"><h2 style="margin-top:0">Submit your assessment?</h2><p>${u?`You have <b>${u}</b> unanswered question${u>1?"s":""}.`:"You have answered all 30 questions."} You will not be able to change your answers after you submit.</p><div class="row"><button class="btn alt" onclick="$('md').remove()">Go back</button><button class="btn" onclick="finish(false)">Yes, submit</button></div></div>`;
+ document.body.appendChild(m);m.querySelector("button").focus()}
+function finish(auto){clearInterval(S.iv);const m=$("md");if(m)m.remove();window.scrollTo(0,0);
+ let ok=0,bad=0,sk=0;const T={},mis={};
+ for(const k in TN)T[k]=[0,0];
+ const rows=Q.map((q,i)=>{const[tp,ans,ex,ms]=K[i],a=S.a[i];T[tp][1]++;let st;
+  if(a===null){sk++;st="skip"}else if(a===ans){ok++;T[tp][0]++;st="ok"}else{bad++;st="bad";(mis[ms]=mis[ms]||[]).push(i+1)}
+  return {i,q,ans,ex,a,st,tp}});
+ const pct=Math.round(ok/30*100),used=Math.min(30,Math.round((Math.min(Date.now(),S.end)-S.t0)/60000));
+ const lab={ok:"Correct",bad:"Incorrect",skip:"Not answered"};
+ const topics=Object.keys(TN).map(k=>{const[c,t]=T[k],p=Math.round(c/t*100);return `<div class="tp"><span>${TN[k]}</span><b>${c}/${t}</b><div class="bar"><i style="width:${p}%"></i></div></div>`}).join("");
+ const grp=f=>Object.keys(TN).filter(k=>f(T[k][0]/T[k][1])).map(k=>`${TN[k]} (${T[k][0]}/${T[k][1]})`);
+ const st=grp(p=>p>=.8),dv=grp(p=>p>=.5&&p<.8),rv=grp(p=>p<.5);
+ const li=a=>a.length?`<ul>${a.map(x=>`<li>${x}</li>`).join("")}</ul>`:"<p>None.</p>";
+ const mi=Object.entries(mis).sort((x,y)=>y[1].length-x[1].length).slice(0,6).map(([m,q])=>`<li>${m} <small>(Q${q.join(", Q")})</small></li>`).join("");
+ const av=T.A[0]/T.A[1];
+ $("app").innerHTML=`<div class="wrap">
+ <div class="card"><h1 style="margin-top:0">Results${S.name?" – "+S.name:""}</h1>${auto?"<p><b>Time ran out, so your assessment was submitted automatically.</b></p>":""}
+ <div class="big">${ok}/30 <span style="font-size:32px">(${pct}%)</span></div><p>Time used: about ${used} minute${used==1?"":"s"}</p>
+ <div class="stats"><div><b style="color:var(--ok);font-size:30px">${ok}</b><br>Correct</div><div><b style="color:var(--bad);font-size:30px">${bad}</b><br>Incorrect</div><div><b style="font-size:30px">${sk}</b><br>Unanswered</div></div>
+ <p class="noprint"><button class="btn alt" onclick="window.print()">Print results</button></p></div>
+ <div class="card"><h2 style="margin-top:0">Topic scores</h2>${topics}</div>
+ <div class="card"><h2 style="margin-top:0">Teacher summary</h2>
+ <h3>Strengths (80% or more)</h3>${li(st)}<h3>Developing (50–79%)</h3>${li(dv)}<h3>Topics to revisit (below 50%)</h3>${li(rv)}
+ <h3>Likely misconceptions</h3>${mi?`<ul>${mi}</ul>`:"<p>No incorrect answers to analyse.</p>"}
+ ${sk?`<p><b>${sk} question${sk>1?"s were":" was"} left blank.</b> Check whether this was timing, confidence or lack of access to the content.</p>`:""}
+ <h3>Averages (not yet taught)</h3><p>${T.A[0]}/${T.A[1]} on prior-understanding questions (mode, mean, bar chart). ${av>=.67?"Some prior knowledge is already secure, so the unit can start with extension.":av>0?"Some prior knowledge is present but patchy, so start with mode and reading charts, then teach mean and median.":"No prior knowledge shown, so teach the unit from the beginning."}</p></div>
+ <h2>Full review of all 30 questions</h2>
+ ${rows.map(r=>`<div class="card rv ${r.st}"><div class="row"><b>Question ${r.i+1} · ${TN[r.tp]}</b><span class="badge">${lab[r.st]}</span></div><p style="font-size:20px">${r.q[0]}</p>${dia(r.q[2])}${r.q[1].map((o,j)=>`<div class="o${j==r.ans?" c":j==r.a?" w":""}"><b>${LT[j]}.</b> ${o}${j==r.a?" — <b>your answer</b>":""}${j==r.ans?" — <b>correct answer</b>":""}</div>`).join("")}${r.a===null?`<p><b>You did not answer this question.</b> Correct answer: ${LT[r.ans]}.</p>`:""}<div class="ex"><b>Explanation:</b> ${r.ex}</div></div>`).join("")}
+ </div>`}
+home();
+</script></body></html>
